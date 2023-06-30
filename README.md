@@ -17,7 +17,7 @@ Maltrail (https://github.com/stamparm/maltrail) IDS with support for mikrotik pa
 ## Build maltrail docker image
 
 ```sh
-docker build . -t maltrail
+docker build . -t maltrail --progress=plain --no-cache
 ```
 
 * Dont forget password from build. Password is random generated

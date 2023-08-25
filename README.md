@@ -54,9 +54,47 @@ Run nmap port scanning from some computer in network to another.
 nmap -p0-65535 (IP OF ANOTHER COMPUTER)
 ```
 
-On maltrail you can after scann see `potential port scanning` threat.
+## Finding issue
 
-### parking site (suspicious) domain
+Get some logs from docker container.
 
-Navigate computer to domain test.cn an after that you can see `parking site (suspicious)` threat.
+```sh
+# for list containers
+docker ps                                                                
+# get the logs  
+docker logs -f {name/id of maltrail container} 
+```
+more info for docker logs: https://docs.docker.com/engine/reference/commandline/logs/
+
+It shut by useful to determinate if Mikrotik sending sniffer stream to docker. For this exec to container and stop running service and start 
+
+```sh
+# for list containers
+docker ps 
+# exec in container
+docker exec -it {name/id of maltrail container} sh 
+# in container
+# for find pid of tzsp2pcap ctrl+c for close of top
+top 
+kill {pid of tzsp2pcap}
+# for make sure tzsp2pcap is kiled
+top
+# read mikrotik sniffer stream in terminal
+tzsp2pcap/tzsp2pcap  -f 
+
+# if you want see packets heders in readeble fromat
+apt update
+apt install tcpdump
+tzsp2pcap/tzsp2pcap  -f | tcpdump -r -
+```
+
+more info for docker exec: https://docs.docker.com/engine/reference/commandline/exec/
+
+Now you must see all sniffed packets in terminal if not please make sure if mikrotik packet stream if running, if yes check firewall rules for port `37008/udp`.  if firewall allowed this port please check `tzsp2pcap` on your main host outside of container.
+
+### Note
+it take some time to display threat in webinterface, please wait some time after you create test threat. Make sure if you not filter out threat with mikrotik filter.
+
+## Open issue on github
+If you cant find reason for issue you can open issue on github. On issue please write logs from docker container and test if mikrotik stream is going to container.
 

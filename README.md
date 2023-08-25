@@ -31,7 +31,7 @@ password for web interface is XXXXXXXX and user is admin
 ## Run maltrail Docker image
 
 ```sh
-docker run -d -p 37008:37008 -p 8337:8337 -p 8338:8338 maltrail
+docker run -d -p 37008:37008/udp -p 8337:8337 -p 8338:8338 maltrail
 ```
 
 Ports:

@@ -54,6 +54,50 @@ Run nmap port scanning from some computer in network to another.
 nmap -p0-65535 (IP OF ANOTHER COMPUTER)
 ```
 
+### DNS lookup
+
+andromeda (malware) domain:
+
+```sh
+nslookup morphed.ru
+```
+
+### IP Ping
+
+Conficker (malware) IP:
+
+```sh
+ping -c 1 136.161.101.53
+```
+
+## Change Password
+
+```sh
+# first generate hash of password
+echo -n "Your New Password" | sha256sum | cut -d " " -f 1
+# open docker contaner shell
+docker exec -it <container_name_or_id> /bin/bash # id can be found by docker ps
+# install editor
+apt install nano
+# edit config file - here replace hash of password with new hash 
+nano /opt/maltrail/maltrail.conf
+# exit from container
+exit
+# restart container
+docker restart <container_name_or_id>
+```
+
+Exmaple Config:
+
+```
+...
+
+USERS
+    admin:MY_NEW_HASH:0:                        # changeme!
+
+...
+```
+
 ## Finding issue
 
 Get some logs from docker container.

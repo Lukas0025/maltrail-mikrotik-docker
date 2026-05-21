@@ -26,4 +26,44 @@ EXPOSE 8337/udp
 EXPOSE 8338/tcp
 EXPOSE 37008/udp
 
-CMD bash -c "python /opt/maltrail/server.py &" && bash -c "python /opt/maltrail/sensor.py &" && bash -c "tzsp2pcap/tzsp2pcap -f | tcpreplay-edit --topspeed --mtu 800 --mtu-trunc -i eth0  -" && cron && tail -f /var/log/cron.log
+CMD ["/bin/bash", "-c", "
+set +e
+set +o pipefail
+
+python /opt/maltrail/server.py &
+python /opt/maltrail/sensor.py &
+
+(
+while true; do
+
+    /tzsp2pcap/tzsp2pcap -f \
+    | tcpreplay-edit \
+        --topspeed \
+        --mtu 800 \
+        --mtu-trunc \
+        --fixcsum \
+        -i eth0 -
+
+    EXIT=$?
+
+    echo \"[WARN] tzsp pipeline exited with code $EXIT\" >&2
+
+    # 143 = SIGTERM
+    # 137 = SIGKILL
+    # 130 = CTRL+C
+
+    if [ $EXIT -eq 143 ] || [ $EXIT -eq 137 ] || [ $EXIT -eq 130 ]; then
+        echo '[INFO] manually stopped, not restarting' >&2
+        break
+    fi
+
+    echo '[INFO] restarting tzsp pipeline in 1s' >&2
+    sleep 1
+
+done
+) &
+
+cron &
+
+tail -f /var/log/cron.log
+"]
